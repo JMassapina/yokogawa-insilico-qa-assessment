@@ -54,7 +54,7 @@ jobs:
       - name: Setup NodeJS Runtime Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22' # Bumped from 20 to 22 for active environment parity
 
       - name: Install Newman CLI (Postman Automated Runner)
         run: npm install -g newman
@@ -76,7 +76,7 @@ jobs:
       - name: Setup NodeJS Runtime Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22' # Bumped from 20 to 22 for active environment parity
           cache: 'npm'
           cache-dependency-path: task4_web_automation/package.json
 
