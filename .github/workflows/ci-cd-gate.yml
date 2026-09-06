@@ -1,0 +1,104 @@
+name: QA Lead Automated Quality Gate Pipeline
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  unit_and_contract_layer:
+    name: 🧪 Run Math Logic & API Schemas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10 Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi pydantic numpy uvicorn pytest httpx
+
+      - name: Execute Pytest (Unit Math Logic)
+        run: |
+          pytest task3_api_testing/ -v
+
+  api_integration_layer:
+    name: 📡 Spin up Backend & Run Newman Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit_and_contract_layer
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Backend Server Dependencies
+        run: pip install fastapi pydantic numpy uvicorn
+
+      - name: Launch Local FastAPI Simulation App (Background Process)
+        run: |
+          cd task3_api_testing/
+          uvicorn qa_simulation_api:app --host 127.0.0.1 --port 8000 &
+          echo "Waiting 3 seconds for FastAPI worker threads to initialize..."
+          sleep 3
+
+      - name: Setup NodeJS Runtime Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman CLI (Postman Automated Runner)
+        run: npm install -g newman
+
+      - name: Execute Automated Postman Collection Tests
+        run: |
+          newman run task3_api_testing/simulation_tests.json \
+            --env-var baseUrl=http://127.0.0.1:8000 \
+            --bail
+
+  web_automation_layer:
+    name: 🌐 Execute Playwright E2E Workspace Verification
+    runs-on: ubuntu-latest
+    needs: api_integration_layer
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      - name: Setup NodeJS Runtime Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: task4_web_automation/package.json
+
+      - name: Install Node Modules & System Dependencies
+        run: |
+          cd task4_web_automation/
+          npm ci || npm install
+
+      - name: Install Playwright Chromium Browser Engine
+        run: |
+          cd task4_web_automation/
+          npx playwright install chromium --with-deps
+
+      - name: Execute Resilient Playwright Automation Tests
+        run: |
+          cd task4_web_automation/
+          npx playwright test
+
+      - name: Archive Automation Run Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-execution-report
+          path: task4_web_automation/playwright-report/
+          retention-days: 14
