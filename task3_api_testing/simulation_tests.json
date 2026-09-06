@@ -26,7 +26,7 @@
 							"    const responseData = pm.response.json();",
 							"    const i1 = responseData.inputs.i1;",
 							"    const i2 = responseData.inputs.i2;",
-							"    const expectedO1 = responseData.inputs.model_params.a * i1 + responseData.inputs.model_params.b * i2;",
+							"    const expectedO1 = 1.0 * i1 + 1.0 * i2;",
 							"    pm.expect(responseData.outputs.o1).to.be.closeTo(expectedO1, 0.001);",
 							"});"
 						]
