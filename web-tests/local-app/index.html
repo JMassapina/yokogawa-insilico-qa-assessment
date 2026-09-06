@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pinned Escher Test Host Canvas</title>
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <script src="escher.min.js"></script>
+    <style>
+        html, body, #map-container { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div id="map-container"></div>
+    <div id="status" style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px; font-family: monospace;">Ready</div>
+    <script>
+        window.onload = function() {
+            try {
+                escher.Builder(null, null, null, d3.select('#map-container'), {
+                    menu: 'all',
+                    fill_screen: true,
+                    never_ask_before_quit: true
+                });
+                document.getElementById('status').innerText = 'Escher canvas initialized successfully';
+            } catch (e) {
+                document.getElementById('status').innerText = 'Initialization Failure: ' + e.message;
+            }
+        };
+    </script>
+</body>
+</html>
