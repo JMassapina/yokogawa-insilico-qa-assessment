@@ -1,0 +1,8 @@
+{
+  "info": {
+    "name": "Insilico simulation API",
+    "description": "Hand-runnable companion to the pytest suite in ../tests.\n\nThis collection is deliberately small. It exists because a scientist or a product manager needs to be able to poke the endpoint without a Python environment, and because Task 3 asks for a Postman artefact. It is not the automated safety net — the pytest suite is, and it covers the same ground plus property-based and metamorphic checks that a collection cannot express.\n\nExpected values are hand-computed and written into the assertions as literal constants, with the arithmetic shown in a comment. An assertion that recomputes the formula it is checking will agree with a broken implementation whenever the formula itself is the bug.\n\nRun headless:\n  newman run simulation.postman_collection.json --env-var baseUrl=http://127.0.0.1:8000",
+    "schema": "https://getpostman.com"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:

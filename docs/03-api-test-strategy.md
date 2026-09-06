@@ -17,5 +17,5 @@ uvicorn qa_simulation_api:app --host 127.0.0.1 --port 8000 &
 
 # 2. Execute tests headlessly via Newman
 npm install -g newman
-newman run simulation_tests.json --env-var base_url=http://127.0.0.1:8000
+newman run simulation_tests.json --env-var baseUrl=http://127.0.0.1:8000
 ```

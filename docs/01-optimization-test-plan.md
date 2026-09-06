@@ -22,7 +22,7 @@ Validating an optimization feature that processes complex cellular simulation pr
     *   *Expected Scientific Tolerance:* Solver reaches a Pareto-optimal frontier solution without timing out or crashing due to objective competition.
 *   **TC-OPT-04 (Scientific Sanity):** 
     *   *Objective Configuration:* `maximize` Product concentration.
-    *   *Design Parameters & Constraints:* Restricted Feed Bounds: Set `Feed1 = 0 L` and `Feed2 = 0 L`.
+    *   *Design Constraints:* Restricted Feed Bounds: Set `Feed1 = 0 L` and `Feed2 = 0 L`.
     *   *Expected Scientific Tolerance:* Optimizer outputs zero or declining cell growth/product trends. Yield calculations must maintain mass balance conservation.
 
 ## 3. Release Readiness Criteria & Quality Gates
