@@ -1,0 +1,68 @@
+name: QA Lead Automated Quality Gate Pipeline
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# Global environment parameters to silence ecosystem deprecation alerts
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  api_testing_layer:
+    name: 🐍 Python Invariants & Schema Fuzzing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+      - name: Install Astral uv Dependency Manager
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Set up Python 3.10 Runtime Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Sync Backend Package Dependencies
+        run: |
+          cd api-tests
+          uv sync
+      - name: Execute Non-Fuzz Gating Tests (Unit, Contract, Invariants)
+        run: |
+          cd api-tests
+          uv run pytest -m "not fuzz" -v
+
+  web_automation_layer:
+    name: 🌐 Playwright E2E Pinned App Verification
+    runs-on: ubuntu-latest
+    needs: api_testing_layer
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+      - name: Setup NodeJS Runtime Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: web-tests/package.json
+      - name: Install Frontend Dependencies & Pinned Escher App
+        run: |
+          cd web-tests
+          npm ci || npm install
+      - name: Install Playwright Chromium Browser Engine
+        run: |
+          cd web-tests
+          npx playwright install chromium --with-deps
+      - name: Execute Playwright Browser Automation Tests
+        continue-on-error: true
+        run: |
+          cd web-tests
+          npx playwright test
+      - name: Upload Playwright Test Failure Artifact Traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-execution-report
+          path: web-tests/playwright-report/
+          retention-days: 7
