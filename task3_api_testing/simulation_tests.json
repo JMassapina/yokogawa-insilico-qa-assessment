@@ -1,0 +1,90 @@
+{
+	"info": {
+		"name": "Yokogawa Insilico Simulation API Core Tests",
+		"schema": "https://getpostman.com"
+	},
+	"item": [
+		{
+			"name": "TC-API-01: Successful Simulation Run with Valid Inputs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('HTTP 200: Successful Execution and Valid Schema Structure', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Core Structural Contract Assertions', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.have.all.keys('inputs', 'outputs');",
+							"    pm.expect(responseData.outputs).to.have.all.keys('o1', 'o2', 'o3');",
+							"});",
+							"",
+							"pm.test('Mathematical Engine Validation Invariant Check', function () {",
+							"    const responseData = pm.response.json();",
+							"    const i1 = responseData.inputs.i1;",
+							"    const i2 = responseData.inputs.i2;",
+							"    const expectedO1 = responseData.inputs.model_params.a * i1 + responseData.inputs.model_params.b * i2;",
+							"    pm.expect(responseData.outputs.o1).to.be.closeTo(expectedO1, 0.001);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"input_data\": {\n        \"i1\": 24.0,\n        \"i2\": 7.1\n    },\n    \"model_params\": {\n        \"a\": 1.0,\n        \"b\": 1.0\n    }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/simulate/",
+					"host": ["{{baseUrl}}"],
+					"path": ["simulate", ""]
+				}
+			}
+		},
+		{
+			"name": "TC-API-02: Input Validation Error - Missing Parameter Payload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('HTTP 422: Validation Engine Intercepts Malformed Schema Components', function () {",
+							"    pm.response.to.have.status(422);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"input_data\": {\n        \"i1\": 24.0\n    },\n    \"model_params\": {\n        \"a\": 1.0,\n        \"b\": 1.0\n    }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/simulate/",
+					"host": ["{{baseUrl}}"],
+					"path": ["simulate", ""]
+				}
+			}
+		}
+	]
+}
